@@ -31,9 +31,9 @@ module.exports = function(context) {
 
         console.log("Found folder:", match);
         
-        const testPath3 = path.join("/Users",username, "Library", "Developer", "Xcode", "DerivedData", match, "Build", "Products", "Debug-iphoneos");
+        const testPath3 = path.join("/Users",username, "Library", "Developer", "Xcode", "DerivedData", match, "Build", "Intermediates.noindex","ArchiveIntermediates", "MABSDebugSymbolsPluginSample", "BuildProductsPath", "Debug-iphoneos", "MABSDebugSymbolsPluginSample.app.dSYM");
 
-        var contents3 = execSync(`ls -laR "${testPath3}"`, { encoding: 'utf8' });
+        var contents3 = fs.existsSync(testPath3);
         console.log('Contents3 of DerivedData folder:');
         console.log(contents3);
 
