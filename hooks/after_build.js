@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+const { exec } = require('child_process');
+
 module.exports = function(context) {
     var fs = require('fs');
     var path = require('path');
@@ -7,10 +9,37 @@ module.exports = function(context) {
 
 
     try {
-        const testPath = path.join("~/Library", "Developer", "Xcode");
-        var contents = execSync(`ls -la "${testPath}"`, { encoding: 'utf8' });
-        console.log('Contents of DerivedData folder:');
-        console.log(contents);
+        var username = execSync(`whoami`, { encoding: 'utf8' }).trim();
+        const testPath = path.join("Users",username, "Library", "Developer", "Xcode");
+        var contents1 = execSync(`ls -la "${testPath}"`, { encoding: 'utf8' });
+
+        const testPath2 = path.join("Users",username, "Library", "Developer", "Xcode", "DerivedData");
+        var contents2 = execSync(`ls -la "${testPath2}"`, { encoding: 'utf8' });
+        
+        const startsWith = 'MABSDebugSymbolsPluginSample';
+        const match = fs.readdirSync(testPath2)
+        .find(name => name.startsWith(startsWith));
+        
+        if (!match) {
+            console.log("Folder not found");
+            process.exit(1);
+        }
+
+        console.log("Found folder:", match);
+        
+        const testPath3 = path.join("Users",username, "Library", "Developer", "Xcode", "DerivedData", match, "Build", "Products", "Debug-iphoneos");
+
+        var contents3 = execSync(`ls -la "${testPath3}"`, { encoding: 'utf8' });
+
+
+        console.log('Contents1 of DerivedData folder:');
+        console.log(contents1);
+
+        console.log('Contents2 of DerivedData folder:');
+        console.log(contents2);
+
+        console.log('Contents3 of DerivedData folder:');
+        console.log(contents3);
     } catch (error) {
         console.error('Error logging DerivedData contents:', error.message);
     }
