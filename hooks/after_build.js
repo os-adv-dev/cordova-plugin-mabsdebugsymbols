@@ -7,7 +7,7 @@ module.exports = function(context) {
 
 
     try {
-        const testPath = path.join("~/Library", "Developer", "Xcode", "DerivedData");
+        const testPath = path.join("~/Library", "Developer", "Xcode");
         var contents = execSync(`ls -la "${testPath}"`, { encoding: 'utf8' });
         console.log('Contents of DerivedData folder:');
         console.log(contents);
