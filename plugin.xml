@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    id="cordova-plugin-mabsdebugsymbols"
+    version="1.0.0">
+    <name>MABS Debug Symbols</name>
+    <description>Cordova plugin to upload iOS dSYM files to a specified endpoint.</description>
+    <license>Apache 2.0</license>
+    <keywords>cordova,ios,dsym,debug,symbols</keywords>
+
+    <preference name="ENDPOINT" />
+    <preference name="USERNAME" />
+    <preference name="PASSWORD" />
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
+
+    <platform name="ios">
+        <hook type="after_build" src="hooks/after_build.js" />
+    </platform>
+</plugin>
