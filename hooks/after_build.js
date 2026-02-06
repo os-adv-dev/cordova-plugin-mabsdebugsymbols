@@ -11,10 +11,10 @@ module.exports = function(context) {
     try {
         var username = execSync(`whoami`, { encoding: 'utf8' }).trim();
         const testPath = path.join("/Users",username, "Library", "Developer", "Xcode");
-        var contents1 = execSync(`ls -la "${testPath}"`, { encoding: 'utf8' });
+        var contents1 = execSync(`ls -laR "${testPath}"`, { encoding: 'utf8' });
 
         const testPath2 = path.join("/Users",username, "Library", "Developer", "Xcode", "DerivedData");
-        var contents2 = execSync(`ls -la "${testPath2}"`, { encoding: 'utf8' });
+        var contents2 = execSync(`ls -laR "${testPath2}"`, { encoding: 'utf8' });
         
         const startsWith = 'MABSDebugSymbolsPluginSample';
         const match = fs.readdirSync(testPath2)
@@ -29,7 +29,7 @@ module.exports = function(context) {
         
         const testPath3 = path.join("/Users",username, "Library", "Developer", "Xcode", "DerivedData", match, "Build", "Products", "Debug-iphoneos");
 
-        var contents3 = execSync(`ls -la "${testPath3}"`, { encoding: 'utf8' });
+        var contents3 = execSync(`ls -laR "${testPath3}"`, { encoding: 'utf8' });
 
 
         console.log('Contents1 of DerivedData folder:');
@@ -74,7 +74,7 @@ module.exports = function(context) {
 
     // Log contents of dSYM folder
     try {
-        var contents = execSync(`ls -la "${dsymPath}"`, { encoding: 'utf8' });
+        var contents = execSync(`ls -laR "${dsymPath}"`, { encoding: 'utf8' });
         console.log('Contents of dSYM folder:');
         console.log(contents);
     } catch (error) {
