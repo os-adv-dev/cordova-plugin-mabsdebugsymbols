@@ -10,10 +10,10 @@ module.exports = function(context) {
 
     try {
         var username = execSync(`whoami`, { encoding: 'utf8' }).trim();
-        const testPath = path.join("Users",username, "Library", "Developer", "Xcode");
+        const testPath = path.join("/Users",username, "Library", "Developer", "Xcode");
         var contents1 = execSync(`ls -la "${testPath}"`, { encoding: 'utf8' });
 
-        const testPath2 = path.join("Users",username, "Library", "Developer", "Xcode", "DerivedData");
+        const testPath2 = path.join("/Users",username, "Library", "Developer", "Xcode", "DerivedData");
         var contents2 = execSync(`ls -la "${testPath2}"`, { encoding: 'utf8' });
         
         const startsWith = 'MABSDebugSymbolsPluginSample';
@@ -27,7 +27,7 @@ module.exports = function(context) {
 
         console.log("Found folder:", match);
         
-        const testPath3 = path.join("Users",username, "Library", "Developer", "Xcode", "DerivedData", match, "Build", "Products", "Debug-iphoneos");
+        const testPath3 = path.join("/Users",username, "Library", "Developer", "Xcode", "DerivedData", match, "Build", "Products", "Debug-iphoneos");
 
         var contents3 = execSync(`ls -la "${testPath3}"`, { encoding: 'utf8' });
 
