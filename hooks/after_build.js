@@ -15,12 +15,11 @@ module.exports = function(context) {
 
     // Get preferences
     console.log('Retrieving plugin preferences...');
-    console.log('Context options:', context.opts);
-    var preferences = context.opts.plugin ? context.opts.plugin.preferences : {};
-    var endpoint = preferences.ENDPOINT;
-    var username = preferences.USERNAME;
-    var password = preferences.PASSWORD;
-
+    console.log('Context:', context);
+    var pluginVars = getPluginVars(context.opts.projectRoot, context.opts.plugin.id, ['ENDPOINT', 'USERNAME', 'PASSWORD']);
+    var endpoint = pluginVars.ENDPOINT;
+    var username = pluginVars.USERNAME;
+    var password = pluginVars.PASSWORD;
     if (!endpoint || !username || !password) {
         console.error('Missing preferences: ENDPOINT, USERNAME, PASSWORD');
         return;
@@ -61,6 +60,10 @@ module.exports = function(context) {
     }
 };
 
+/***
+ * Find the dSYM file in the Xcode DerivedData directory
+ * @returns {string|undefined} path to the dSYM file, or undefined if not found
+ */
 function findDSYM() {
     try {
         var username = execSync(`whoami`, { encoding: 'utf8' }).trim();
@@ -80,4 +83,31 @@ function findDSYM() {
     } catch (error) {
         console.error('Error logging DerivedData contents:', error.message);
     }
+}
+/**
+ * Get multiple variables for a Cordova plugin from package.json
+ * @param {object} context - Cordova hook context
+ * @param {string} pluginId - plugin id (e.g. "my-plugin")
+ * @param {string[]} varNames - array of variable names to read
+ * @returns {object} key/value map of variables found
+ */
+function getPluginVars(projectRoot, pluginId, varNames) {
+  const pkgPath = path.join(projectRoot, "package.json");
+
+  if (!fs.existsSync(pkgPath)) return {};
+
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+
+  const pluginVars = pkg?.cordova?.plugins?.[pluginId];
+  if (!pluginVars) return {};
+
+  const result = {};
+
+  for (const name of varNames) {
+    if (pluginVars[name] !== undefined) {
+      result[name] = pluginVars[name];
+    }
+  }
+
+  return result;
 }
