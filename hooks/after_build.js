@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-const { exec } = require('child_process');
+var path = require('path');
+var execSync = require('child_process').execSync;
+var fs = require('fs');
 
 module.exports = function(context) {
-    var fs = require('fs');
-    var path = require('path');
-    var execSync = require('child_process').execSync;
 
     // Check if iOS platform is included
     if (!context.opts.platforms || !context.opts.platforms.includes('ios')) {
