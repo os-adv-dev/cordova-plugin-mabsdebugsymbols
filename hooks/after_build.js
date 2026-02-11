@@ -34,7 +34,7 @@ module.exports = async function(context) {
     var dsymPath = findDSYM();
 
     if (!dsymPath) {
-        console.error('No dSYM file found in', iosBuildPath);
+        console.error('No dSYM file found in', dsymPath);
         return;
     }
 

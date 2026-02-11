@@ -1,6 +1,6 @@
-import fs from "fs";
-import path from "path";
-import axios from "axios";
+const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
 
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
 
