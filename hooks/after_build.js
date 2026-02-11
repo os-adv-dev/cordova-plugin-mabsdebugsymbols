@@ -144,4 +144,5 @@ function getAppName(projectRoot) {
         console.error('Error reading config.xml:', error);
         appName = path.basename(projectRoot);
     }
+    return appName;
 }
