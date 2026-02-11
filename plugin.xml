@@ -8,7 +8,7 @@
     <keywords>cordova,ios,dsym,debug,symbols</keywords>
 
     <preference name="ENABLED" default="true" />
-    <preference name="ENDPOINT" />
+    <preference name="BASEURL" />
     <preference name="USERNAME" />
     <preference name="PASSWORD" />
 
