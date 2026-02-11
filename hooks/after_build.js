@@ -3,8 +3,9 @@
 var path = require('path');
 var execSync = require('child_process').execSync;
 var fs = require('fs');
+var multipartUploadZip = require('./upload.js');
 
-module.exports = function(context) {
+module.exports = async function(context) {
 
     // Check if iOS platform is included
     if (!context.opts.platforms || !context.opts.platforms.includes('ios')) {
@@ -44,7 +45,16 @@ module.exports = function(context) {
         return;
     }
 
-    // Upload the zip
+    await multipartUploadZip({
+        filePath: zipPath,
+        baseUrl: endpoint,
+        username: username,
+        password: password,
+    })
+    .then(res => console.log(res))
+    .catch(err => console.error(err));
+
+    /*// Upload the zip
     try {
         var uploadCommand = `curl -X POST -u "${username}:${password}" -F "file=@${zipPath}" "${endpoint}"`;
         var result = execSync(uploadCommand, { encoding: 'utf8' });
@@ -56,7 +66,7 @@ module.exports = function(context) {
         if (fs.existsSync(zipPath)) {
             fs.unlinkSync(zipPath);
         }
-    }
+    }*/
 };
 
 /***
