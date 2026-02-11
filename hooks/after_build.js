@@ -16,10 +16,15 @@ module.exports = async function(context) {
     // Get preferences
     console.log('Retrieving plugin preferences...');
     console.log('Context:', context);
-    var pluginVars = getPluginVars(context.opts.projectRoot, context.opts.plugin.id, ['ENDPOINT', 'USERNAME', 'PASSWORD']);
+    var pluginVars = getPluginVars(context.opts.projectRoot, context.opts.plugin.id, [ 'ENABLED', 'ENDPOINT', 'USERNAME', 'PASSWORD']);
+    var enabled = pluginVars.ENABLED;
     var endpoint = pluginVars.ENDPOINT;
     var username = pluginVars.USERNAME;
     var password = pluginVars.PASSWORD;
+    if (!enabled) {
+        console.log('Plugin is disabled.');
+        return;
+    }
     if (!endpoint || !username || !password) {
         console.error('Missing preferences: ENDPOINT, USERNAME, PASSWORD');
         return;

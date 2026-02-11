@@ -1,5 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
+import fs from "fs";
+import path from "path";
 import axios from "axios";
 
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
