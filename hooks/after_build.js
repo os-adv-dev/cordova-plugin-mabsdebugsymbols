@@ -31,8 +31,11 @@ module.exports = async function(context) {
         return;
     }
 
+    //Get app name from project config.xml
+    var appName = getAppName(context.opts.projectRoot);
+
     // Find dSYM path
-    var dsymPath = findDSYM();
+    var dsymPath = findDSYM(appName, context.opts.options && context.opts.options.debug);
 
     if (!dsymPath) {
         console.error('No dSYM file found in', dsymPath);
@@ -50,9 +53,7 @@ module.exports = async function(context) {
         console.error('Error zipping dSYM:', error.message);
         return;
     }
-
-    //Get app name from project config.xml
-    var appName = getAppName(context.opts.projectRoot);
+    
     await multipartUploadZip({
         filePath: zipPath,
         baseUrl: baseUrl,
@@ -68,20 +69,23 @@ module.exports = async function(context) {
  * Find the dSYM file in the Xcode DerivedData directory
  * @returns {string|undefined} path to the dSYM file, or undefined if not found
  */
-function findDSYM() {
+function findDSYM(appName, isDebug = true) {
     try {
         var username = execSync(`whoami`, { encoding: 'utf8' }).trim();
 
-        const derivedData = path.join("/Users",username, "Library", "Developer", "Xcode", "DerivedData");
-        const projectNameStartsWith = 'MABSDebugSymbolsPluginSample';
+        const derivedData = path.join(path.sep, "Users", username, "Library", "Developer", "Xcode", "DerivedData");
+        const projectNameStartsWith = appName;
         const match = fs.readdirSync(derivedData)
             .find(name => name.startsWith(projectNameStartsWith));
         
         if (!match) {
             return;
         }
-
-        dsymPath = path.join(derivedData, match, "Build", "Intermediates.noindex","ArchiveIntermediates", projectNameStartsWith, "BuildProductsPath", "Debug-iphoneos", projectNameStartsWith + ".app.dSYM");
+        let iphoneOSFolder = "Release-iphoneos";
+        if (isDebug) {
+            iphoneOSFolder = "Debug-iphoneos";
+        }
+        dsymPath = path.join(derivedData, match, "Build", "Intermediates.noindex", "ArchiveIntermediates", projectNameStartsWith, "BuildProductsPath", iphoneOSFolder, projectNameStartsWith + ".app.dSYM");
 
         return dsymPath;
     } catch (error) {
