@@ -4,13 +4,12 @@ const axios = require('axios');
 
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
 
-module.exports = async function({ filePath, baseUrl, username, password }) {
+module.exports = async function({ filePath, baseUrl, username, password, appName}) {
   const stat = await fs.promises.stat(filePath);
   const fileSize = stat.size;
   const fileName = path.basename(filePath);
 
   // 1) Start upload
-  let appName = "MyApp";
   const startRes = await axios.post(
     `${baseUrl}/Uploads/Start/${encodeURIComponent(appName)}`,
     { fileName, fileSize, contentType: "application/zip" },

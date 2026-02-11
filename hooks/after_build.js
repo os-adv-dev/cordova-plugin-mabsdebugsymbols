@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 var path = require('path');
-var execSync = require('child_process').execSync;
+var xml2js = require('xml2js');
 var fs = require('fs');
+var execSync = require('child_process').execSync;
 var multipartUploadZip = require('./upload.js');
 
 module.exports = async function(context) {
@@ -16,17 +17,17 @@ module.exports = async function(context) {
     // Get preferences
     console.log('Retrieving plugin preferences...');
     console.log('Context:', context);
-    var pluginVars = getPluginVars(context.opts.projectRoot, context.opts.plugin.id, [ 'ENABLED', 'ENDPOINT', 'USERNAME', 'PASSWORD']);
+    var pluginVars = getPluginVars(context.opts.projectRoot, context.opts.plugin.id, [ 'ENABLED', 'BASEURL', 'USERNAME', 'PASSWORD']);
     var enabled = pluginVars.ENABLED;
-    var endpoint = pluginVars.ENDPOINT;
+    var baseUrl = pluginVars.BASEURL;
     var username = pluginVars.USERNAME;
     var password = pluginVars.PASSWORD;
     if (!enabled) {
         console.log('Plugin is disabled.');
         return;
     }
-    if (!endpoint || !username || !password) {
-        console.error('Missing preferences: ENDPOINT, USERNAME, PASSWORD');
+    if (!baseUrl || !username || !password) {
+        console.error('Missing preferences: BASEURL, USERNAME, PASSWORD');
         return;
     }
 
@@ -50,28 +51,17 @@ module.exports = async function(context) {
         return;
     }
 
+    //Get app name from project config.xml
+    var appName = getAppName(context.opts.projectRoot);
     await multipartUploadZip({
         filePath: zipPath,
-        baseUrl: endpoint,
+        baseUrl: baseUrl,
         username: username,
         password: password,
+        appName: appName
     })
     .then(res => console.log(res))
     .catch(err => console.error(err));
-
-    /*// Upload the zip
-    try {
-        var uploadCommand = `curl -X POST -u "${username}:${password}" -F "file=@${zipPath}" "${endpoint}"`;
-        var result = execSync(uploadCommand, { encoding: 'utf8' });
-        console.log('Upload result:', result);
-    } catch (error) {
-        console.error('Error uploading dSYM:', error.message);
-    } finally {
-        // Clean up zip file
-        if (fs.existsSync(zipPath)) {
-            fs.unlinkSync(zipPath);
-        }
-    }*/
 };
 
 /***
@@ -100,7 +90,7 @@ function findDSYM() {
 }
 /**
  * Get multiple variables for a Cordova plugin from package.json
- * @param {object} context - Cordova hook context
+ * @param {string} projectRoot - Cordova project root path
  * @param {string} pluginId - plugin id (e.g. "my-plugin")
  * @param {string[]} varNames - array of variable names to read
  * @returns {object} key/value map of variables found
@@ -124,4 +114,34 @@ function getPluginVars(projectRoot, pluginId, varNames) {
   }
 
   return result;
+}
+
+/**
+ * Get app name from config.xml in a Cordova project
+ * @param {string} projectRoot - Cordova project root path
+ * @return {string} app name, or folder name if not found
+ */
+function getAppName(projectRoot) {
+   var appName;
+    try {
+        var configXmlPath = path.join(projectRoot, 'config.xml');
+        if (fs.existsSync(configXmlPath)) {
+            var configXml = fs.readFileSync(configXmlPath, 'utf8');
+            xml2js.parseString(configXml, (err, result) => {
+                if (err) {
+                    console.error('Error parsing config.xml:', err);
+                    appName = path.basename(projectRoot);
+                    return;
+                }
+                appName = result.widget.name[0]; // Adjust based on your XML structure
+                console.log('App name from config.xml:', appName);
+            });
+        } else {
+            console.warn('config.xml not found, using default app name.');
+            appName = path.basename(projectRoot);
+        }
+    } catch (error) {
+        console.error('Error reading config.xml:', error);
+        appName = path.basename(projectRoot);
+    }
 }
